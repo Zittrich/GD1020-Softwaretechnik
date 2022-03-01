@@ -6,8 +6,20 @@ using System.Threading.Tasks;
 
 namespace GD1020_Softwaretechnik
 {
-    class GraphStructure<T>
+    public class Program<T>
     {
+    }
+
+    public class GraphStructure<T>
+    {
+        static void Main(string[] args)
+        {
+            GraphStructure<T> graphStructure = new GraphStructure<T>(null, null);
+            graphStructure = graphStructure.GenerateGraph(60, 7, 100);
+            Console.WriteLine("Done");
+            Console.ReadKey();
+        }
+
         internal Random random = new Random();
 
         private Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDicitionary;
@@ -18,20 +30,16 @@ namespace GD1020_Softwaretechnik
             VertexList = vertexList;
         }
 
-        protected internal class Vertex<T>
+        public class Vertex<TVert>
         {
-            private T Information;
-            private T ID;
+            private readonly TVert Information;
+            public  readonly int ID;
 
-            public Vertex(T information, T id)
+            public Vertex(TVert information, int id)
             {
                 Information = information;
                 ID = id;
             }
-        }
-
-        static void Main(string[] args)
-        {
         }
 
         public GraphStructure<T> GenerateGraph(int graphSize, int maximumNeighbors, int maximumWeight)
@@ -41,7 +49,7 @@ namespace GD1020_Softwaretechnik
 
             for (int i = 0; i <= graphSize; i++)
             {
-                graphStructure.VertexList.Add(new Vertex<T>(vertexInformation, (T)(object) i));
+                graphStructure.VertexList.Add(new Vertex<T>(vertexInformation, i));
 
                 int thisNeighborAmount = random.Next(1, maximumNeighbors);
                 List<(int, int)> thisList = new List<(int, int)>();
@@ -58,27 +66,61 @@ namespace GD1020_Softwaretechnik
 
         public void MakeNull()
         {
+            VertexList = null;
             ConnectionDicitionary = null;
         }
 
-        public void InsertVertex(TConstituent vertex)
+        public void InsertVertex(int vertexID, T information)
+        {
+            if (ConnectionDicitionary.ContainsKey(vertexID))
+                throw new ArgumentException("Vertex ID already exists");
+
+            VertexList.Add(new Vertex<T>(information, vertexID));
+            ConnectionDicitionary.Add(vertexID, new List<(int, int)>());
+        }
+
+        public void DeleteVertex(int vertexID)
+        {
+            if (!ConnectionDicitionary.ContainsKey(vertexID))
+                throw new ArgumentException("Vertex ID does not exist");
+
+            foreach(Vertex<T> vertex in VertexList)
+            {
+                if(vertex.ID == vertexID)
+                {
+                    VertexList.Remove(vertex);
+                    break;
+                }
+            }
+
+            ConnectionDicitionary.Remove(vertexID);
+
+            foreach (KeyValuePair<int, List<(int,int)>> keyValuePair in ConnectionDicitionary)
+            {
+                foreach((int weight, int connectedVertex) valuePair in keyValuePair.Value)
+                if (valuePair == (valuePair.weight, vertexID))
+                {
+                    ConnectionDicitionary.Remove(keyValuePair.Key);
+                }
+            }
+        }
+
+        public void ConnectVertices(int vertexA, int vertexB, int weight)
         {
 
         }
 
-        public void DeleteVertex(TConstituent vertex)
+        public void DisconnectVertices(int vertexA, int vertexB, int weight)
         {
 
         }
 
-        public void ConnectVertices(TConstituent vertexA, TConstituent vertexB)
-        {
+        //changeVertexInformation
 
-        }
-
-        public void DisconnectVertices(TConstituent vertexA, TConstituent vertexB)
-        {
-
-        }
+        //member_vertex
+        //member_edge
+        //edge_weight
+        //mark_vertex
+        //mark_edge
     }
 }

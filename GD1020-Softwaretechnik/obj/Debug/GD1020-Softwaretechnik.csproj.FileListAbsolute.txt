@@ -1,0 +1,2 @@
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csprojAssemblyReference.cache
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csproj.CoreCompileInputs.cache

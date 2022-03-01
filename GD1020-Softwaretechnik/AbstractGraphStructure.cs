@@ -16,16 +16,16 @@ namespace GD1020_Softwaretechnik
             _constructor = constructor;
         }
 
-        public TResult GenerateGraph()
+        /*public TResult GenerateGraph()
         {
 
-        }
+        }*/
 
         public void MakeNull<T>(TResult graph)
         {
             try
             {
-                graph = null;
+                //graph = null;
             }
 
             catch
