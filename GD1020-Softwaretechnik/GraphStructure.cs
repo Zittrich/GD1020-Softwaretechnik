@@ -50,9 +50,9 @@ namespace GD1020_Softwaretechnik
             foreach (KeyValuePair<int, List<(int weight, int connectedVertex)>> keyValuePair in ConnectionDictionary)
             {
                 Console.Write($"{keyValuePair.Key} ||");
-                for (int i = 0; i < keyValuePair.Value.Count; i++)
+                foreach (var t in keyValuePair.Value)
                 {
-                    Console.Write($"{keyValuePair.Value[i]}, ");
+                    Console.Write($"{t}, ");
                 }
                 Console.WriteLine();
             }
@@ -135,12 +135,22 @@ namespace GD1020_Softwaretechnik
 
         public void ConnectVertices(int vertexA, int vertexB, int weight)
         {
+            if (VertexList.Count < vertexA || VertexList.Count < vertexB)
+                throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
+            if (ConnectionDictionary[vertexA].Contains((vertexB, weight)))
+                throw new ArgumentException("Connection already exists");
 
+            ConnectionDictionary[vertexA].Add((vertexB, weight));
         }
 
         public void DisconnectVertices(int vertexA, int vertexB, int weight)
         {
+            if (VertexList.Count < vertexA || VertexList.Count < vertexB)
+                throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
+            if (!ConnectionDictionary[vertexA].Contains((vertexB, weight)))
+                throw new ArgumentException("Connection does not exist");
 
+            ConnectionDictionary[vertexA].Remove((vertexB, weight));
         }
 
         //changeVertexInformation

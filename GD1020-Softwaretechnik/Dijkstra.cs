@@ -23,7 +23,7 @@ namespace GD1020_Softwaretechnik
             //remove u aus remainingVert
             //für alle Knoten v mit Nachbar u (Edge)
             //falls v in Q
-            //Update Distanz (siehe später)
+            //Update Distanz ...
         }
     }*/
 }
