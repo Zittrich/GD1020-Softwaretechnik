@@ -1,2 +1,7 @@
-C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csprojAssemblyReference.cache
 C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csproj.CoreCompileInputs.cache
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csproj.AssemblyReference.cache
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\bin\Debug\GD1020-Softwaretechnik.exe.config
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\bin\Debug\GD1020-Softwaretechnik.exe
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\bin\Debug\GD1020-Softwaretechnik.pdb
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.exe
+C:\Users\Jan\source\repos\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.pdb

@@ -1,64 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
 
+//Cursor Parkplatz
+
 namespace GD1020_Softwaretechnik
 {
-    public class Program<T>
-    {
-    }
-
-    public class GraphStructure<T>
+    public class Program
     {
         static void Main(string[] args)
         {
-            GraphStructure<T> graphStructure = new GraphStructure<T>(null, null);
-            graphStructure = graphStructure.GenerateGraph(60, 7, 100);
-            Console.WriteLine("Done");
+            GraphStructure graphStructure = new GraphStructure(null, null);
+            graphStructure = graphStructure.GenerateRandomGraph(10, 3, 10);
+            graphStructure.PrintGraph();
             Console.ReadKey();
         }
-
+    }
+    public class GraphStructure
+    {
         internal Random random = new Random();
 
-        private Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDicitionary;
-        private List<Vertex<T>> VertexList;
-        public GraphStructure(Dictionary<int, List<(int weight, int connectedVertex)>> connectionDicitionary, List<Vertex<T>> vertexList)
+        //Dictionary mit T(zurück zu int?) und weight + connected Vert
+        private Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDictionary;
+
+        //Liste aller Vertices im Graphen
+        private List<Vertex> VertexList;
+
+        public GraphStructure(Dictionary<int, List<(int weight, int connectedVertex)>> connectionDictionary, List<Vertex> vertexList)
         {
-            ConnectionDicitionary = connectionDicitionary;
+            ConnectionDictionary = connectionDictionary;
             VertexList = vertexList;
         }
 
-        public class Vertex<TVert>
+        public class Vertex
         {
-            private readonly TVert Information;
             public  readonly int ID;
 
-            public Vertex(TVert information, int id)
+            public Vertex(int id)
             {
-                Information = information;
                 ID = id;
             }
         }
 
-        public GraphStructure<T> GenerateGraph(int graphSize, int maximumNeighbors, int maximumWeight)
+        public void PrintGraph()
         {
-            GraphStructure<T> graphStructure = new GraphStructure<T>(new Dictionary<int, List<(int weight, int connectedVertex)>>(), new List<Vertex<T>>());
-            T vertexInformation = (T)(object) "placeholder";
+            foreach (KeyValuePair<int, List<(int weight, int connectedVertex)>> keyValuePair in ConnectionDictionary)
+            {
+                Console.Write($"{keyValuePair.Key} ||");
+                for (int i = 0; i < keyValuePair.Value.Count; i++)
+                {
+                    Console.Write($"{keyValuePair.Value[i]}, ");
+                }
+                Console.WriteLine();
+            }
+        }
 
+        public GraphStructure GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight)
+        {
+            GraphStructure graphStructure = new GraphStructure(new Dictionary<int, List<(int weight, int connectedVertex)>>(), new List<Vertex>());
             for (int i = 0; i <= graphSize; i++)
             {
-                graphStructure.VertexList.Add(new Vertex<T>(vertexInformation, i));
+                graphStructure.VertexList.Add(new Vertex(i));
 
+                bool isDirty = false;
                 int thisNeighborAmount = random.Next(1, maximumNeighbors);
-                List<(int, int)> thisList = new List<(int, int)>();
-
+                List<(int weight, int connectedVertex)> thisList = new List<(int, int)>();
                 for (int j = 0; j <= thisNeighborAmount; j++)
                 {
-                    thisList.Add((random.Next(1, maximumWeight + 1), random.Next(i, maximumNeighbors + 1)));
+                    int weightRandom = random.Next(1, maximumWeight);
+                    int connectedRandomVertex = random.Next(i, Math.Min(maximumNeighbors + i, graphSize));
+
+                    for (int k = 0; k < thisList.Count; k++)
+                    {
+                        if (thisList[k] == (thisList[k].weight, connectedRandomVertex))
+                            isDirty = true;
+                    }
+                    if(!isDirty)
+                        thisList.Add((weightRandom, connectedRandomVertex));
+
+                    isDirty = false;
                 }
-                graphStructure.ConnectionDicitionary.Add(i, thisList);
+                graphStructure.ConnectionDictionary.Add(i, thisList);
             }
 
             return graphStructure;
@@ -67,24 +92,24 @@ namespace GD1020_Softwaretechnik
         public void MakeNull()
         {
             VertexList = null;
-            ConnectionDicitionary = null;
+            ConnectionDictionary = null;
         }
 
-        public void InsertVertex(int vertexID, T information)
+        public void InsertVertex(int vertexID)
         {
-            if (ConnectionDicitionary.ContainsKey(vertexID))
+            if (ConnectionDictionary.ContainsKey(vertexID))
                 throw new ArgumentException("Vertex ID already exists");
 
-            VertexList.Add(new Vertex<T>(information, vertexID));
-            ConnectionDicitionary.Add(vertexID, new List<(int, int)>());
+            VertexList.Add(new Vertex(vertexID));
+            ConnectionDictionary.Add(vertexID, new List<(int, int)>());
         }
 
         public void DeleteVertex(int vertexID)
         {
-            if (!ConnectionDicitionary.ContainsKey(vertexID))
+            if (!ConnectionDictionary.ContainsKey(vertexID))
                 throw new ArgumentException("Vertex ID does not exist");
 
-            foreach(Vertex<T> vertex in VertexList)
+            foreach(Vertex vertex in VertexList)
             {
                 if(vertex.ID == vertexID)
                 {
@@ -93,15 +118,18 @@ namespace GD1020_Softwaretechnik
                 }
             }
 
-            ConnectionDicitionary.Remove(vertexID);
+            ConnectionDictionary.Remove(vertexID);
 
-            foreach (KeyValuePair<int, List<(int,int)>> keyValuePair in ConnectionDicitionary)
+            foreach (KeyValuePair<int, List<(int,int)>> keyValuePair in ConnectionDictionary)
             {
                 foreach((int weight, int connectedVertex) valuePair in keyValuePair.Value)
-                if (valuePair == (valuePair.weight, vertexID))
                 {
-                    ConnectionDicitionary.Remove(keyValuePair.Key);
+                    if (valuePair == (valuePair.weight, vertexID))
+                    {
+                        ConnectionDictionary.Remove(keyValuePair.Key);
+                    }
                 }
+                //for schleife statt for each
             }
         }
 
