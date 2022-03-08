@@ -52,7 +52,7 @@ namespace GD1020_Softwaretechnik
                 Console.Write($"Vertex: {keyValuePair.Key} || ");
                 foreach (var t in keyValuePair.Value)
                 {
-                    Console.Write($"[Weight: {t.weight}, Vertex: {t.connectedVertex}];  ");
+                    Console.Write($"[Weight: {t.weight}, Vertex: {t.connectedVertex}]; ");
                 }
                 Console.WriteLine();
             }
@@ -71,7 +71,7 @@ namespace GD1020_Softwaretechnik
                 for (int j = 0; j <= thisNeighborAmount; j++)
                 {
                     int weightRandom = random.Next(1, maximumWeight);
-                    int connectedRandomVertex = random.Next(i, Math.Min(maximumNeighbors + i, graphSize));
+                    int connectedRandomVertex = random.Next(i + 1, Math.Min(maximumNeighbors + i, graphSize));
 
                     for (int k = 0; k < thisList.Count; k++)
                     {
