@@ -14,7 +14,7 @@ namespace GD1020_Softwaretechnik
         static void Main(string[] args)
         {
             GraphStructure graphStructure = new GraphStructure(null, null);
-            graphStructure = graphStructure.GenerateRandomGraph(10, 3, 10);
+            graphStructure = graphStructure.GenerateRandomGraph(4, 3, 10);
             graphStructure.PrintGraph();
             Console.ReadKey();
         }
@@ -49,10 +49,10 @@ namespace GD1020_Softwaretechnik
         {
             foreach (KeyValuePair<int, List<(int weight, int connectedVertex)>> keyValuePair in ConnectionDictionary)
             {
-                Console.Write($"{keyValuePair.Key} ||");
+                Console.Write($"Vertex: {keyValuePair.Key} || ");
                 foreach (var t in keyValuePair.Value)
                 {
-                    Console.Write($"{t}, ");
+                    Console.Write($"[Weight: {t.weight}, Vertex: {t.connectedVertex}];  ");
                 }
                 Console.WriteLine();
             }
@@ -61,7 +61,7 @@ namespace GD1020_Softwaretechnik
         public GraphStructure GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight)
         {
             GraphStructure graphStructure = new GraphStructure(new Dictionary<int, List<(int weight, int connectedVertex)>>(), new List<Vertex>());
-            for (int i = 0; i <= graphSize; i++)
+            for (int i = 0; i < graphSize; i++)
             {
                 graphStructure.VertexList.Add(new Vertex(i));
 
