@@ -14,7 +14,7 @@ namespace GD1020_Softwaretechnik
         static void Main(string[] args)
         {
             GraphStructure graphStructure = new GraphStructure(null, null);
-            graphStructure = graphStructure.GenerateRandomGraph(4, 3, 10);
+            graphStructure = graphStructure.GenerateRandomGraph(100, 10, 10);
             graphStructure.PrintGraph();
             Console.ReadKey();
         }
@@ -71,12 +71,21 @@ namespace GD1020_Softwaretechnik
                 for (int j = 0; j <= thisNeighborAmount; j++)
                 {
                     int weightRandom = random.Next(1, maximumWeight);
-                    int connectedRandomVertex = random.Next(i + 1, Math.Min(maximumNeighbors + i, graphSize));
+                    int connectedRandomVertex = random.Next(i + 1 >= graphSize ? i : i + 1, Math.Min(maximumNeighbors + i, graphSize));
 
                     for (int k = 0; k < thisList.Count; k++)
                     {
                         if (thisList[k] == (thisList[k].weight, connectedRandomVertex))
+                        {
                             isDirty = true;
+                            break;
+                        }
+
+                        if (connectedRandomVertex == i)
+                        {
+                            isDirty = true;
+                            break;
+                        }
                     }
                     if(!isDirty)
                         thisList.Add((weightRandom, connectedRandomVertex));
