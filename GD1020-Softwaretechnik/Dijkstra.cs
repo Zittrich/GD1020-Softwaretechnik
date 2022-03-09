@@ -10,10 +10,6 @@ namespace GD1020_Softwaretechnik
     public class Dijkstra
     {
         /*
-         * Start: Wählt schrittweise den nächsten kürzesten Weg aus
-         * Dabei kann er Verbesserungen vornehmen
-         * Es wird gespeichert: Welcher Knoten Vorgänger ist und wie teuer der Weg ist
-         *
          * Initialisierung:
          * Weg zum Startknoten: 0 Kosten
          * Andere Wege: -1 Kosten, unbekannt
@@ -29,7 +25,6 @@ namespace GD1020_Softwaretechnik
          * Kosten werden verringert
          * Ist der Knoten bereits in der Warteschlange?
          * Falls nein, füge ihn in Warteschlange hinzu + neue Kosten = Vorgängerknoten + Kosten Vorgängerknoten/Knoten Verbindung
-         *
          */
 
         public (int[] costs, int[] preds) RunDijk(GraphStructure graph, GraphStructure.Vertex startVert)
@@ -117,33 +112,27 @@ namespace GD1020_Softwaretechnik
             return output;
         }
 
-        /*
-        //Wikipedia
-        public void RunDijkstra(Graph, Startknoten)
+        public void PrintDijk(GraphStructure graphStructure)
         {
-            //1. initialisieren, Infos
+            (int[] costs, int[] preds) output = RunDijk(graphStructure, graphStructure.VertexList[0]);
+            Console.WriteLine("Kosten:");
+            foreach (int cost in output.costs)
+            {
+                Console.WriteLine(cost);
+            }
 
-            //für jeden Knoten in vertexList
-            //  Abstand = -1
-            //  Vorgänger = null
-            //Abstand Startknoten = 0
-            //Liste mit allen Vertices remainingVert
+            Console.WriteLine("Vorgänger:");
+            foreach (int pred in output.preds)
+            {
+                Console.WriteLine(pred);
+            }
 
-            //while remainingVert.Count > 0
-            //u = knoten mit kleinstem Abstand
-            //remove u aus remainingVert
-            //für alle Knoten v mit Nachbar u (Edge)
-            //falls v in Q
-
-            //Update Distanz (Funktion)
-            //temp = abstand[u] + abstand_zwischen(u, v)
-            //falls alternativ < abstand[v]
-            //  abstand[v] = temp
-            //  vorgänger[v] = u
-
-            //return vorgänger[]
-
+            Console.WriteLine("Weg:");
+            List<int> path = BuildPath(output, graphStructure.VertexList[4]);
+            foreach (int i in path)
+            {
+                Console.WriteLine(i);
+            }
         }
-        */
     }
 }
