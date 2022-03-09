@@ -24,10 +24,12 @@ namespace GD1020_Softwaretechnik
         internal Random random = new Random();
 
         //Dictionary mit T(zurück zu int?) und weight + connected Vert
-        private Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDictionary;
+        public readonly Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDictionary;
+        //L: davor private
 
         //Liste aller Vertices im Graphen
-        private List<Vertex> VertexList;
+        public readonly List<Vertex> VertexList;
+        //L: davor private
 
         public GraphStructure(Dictionary<int, List<(int weight, int connectedVertex)>> connectionDictionary, List<Vertex> vertexList)
         {
