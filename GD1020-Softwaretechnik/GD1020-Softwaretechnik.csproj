@@ -50,6 +50,7 @@
     <Compile Include="Dijkstra.cs" />
     <Compile Include="ExampleClass.cs" />
     <Compile Include="GraphStructure.cs" />
+    <Compile Include="Kruskal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
