@@ -150,6 +150,14 @@ namespace GD1020_Softwaretechnik
             }
         }
 
+        public void InsertMultipleVertices(int[] verticesID)
+        {
+            for (int i = 0; i <= verticesID.Length; i++)
+            {
+                InsertVertex(i);
+            }
+        }
+
         public void DeleteVertex(int vertexID)
         {
             if (!_connectionDictionary.ContainsKey(vertexID))
