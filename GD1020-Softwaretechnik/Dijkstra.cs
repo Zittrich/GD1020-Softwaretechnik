@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GD1020_Softwaretechnik
 {
-    class Dijkstra
+    public class Dijkstra
     {
         /*
          * Start: Wählt schrittweise den nächsten kürzesten Weg aus

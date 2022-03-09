@@ -23,9 +23,16 @@ namespace GD1020_Softwaretechnik
             graphStructure.ConnectVertices(0, 3, 50);
             graphStructure.ConnectVertices(1, 2, 100);
             graphStructure.ConnectVertices(1, 4, 250);
-            graphStructure.ConnectVertices(2, 1, 100);
-            graphStructure.ConnectVertices(2, 4, 250);
-            graphStructure.ConnectVertices(3, 4, 50);
+            graphStructure.ConnectVertices(2, 4, 50);
+            graphStructure.ConnectVertices(3, 1, 100);
+            graphStructure.ConnectVertices(3, 4, 250);
+
+            Dijkstra dijk = new Dijkstra();
+            int[] output = dijk.RunDijk2(graphStructure, graphStructure.VertexList[0]);
+            foreach (int cost in output)
+            {
+                Console.WriteLine(cost);
+            }
 
             graphStructure.PrintGraph();
             Console.ReadKey();
