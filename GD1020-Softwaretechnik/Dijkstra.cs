@@ -31,7 +31,7 @@ namespace GD1020_Softwaretechnik
          *
          */
 
-        public int[] RunDijk2(GraphStructure graph, GraphStructure.Vertex startVert)
+        public int[] RunDijk(GraphStructure graph, GraphStructure.Vertex startVert)
         {
             //Initialisierung
             int vertAmount = graph.VertexList.Count;
@@ -96,71 +96,6 @@ namespace GD1020_Softwaretechnik
 
             return costs;
         }
-
-        public void RunDijk(GraphStructure graph, GraphStructure.Vertex startVert)
-        {
-            //Initialisierung
-
-            //temp Vars
-            int vertAmount = graph.VertexList.Count;
-            int startVertId = 0;
-
-            //Kosten Wege zu allen Knoten
-            int[] costs = new int[vertAmount];
-            for (int i = 0; i < vertAmount; i++)
-            {
-                costs[i] = -1;
-            }
-
-            //Vorgänger
-            int[] preds = new int[vertAmount];
-
-            //sammelt alle IDs in einem Array, neue ID ist der Index im Array
-            int[] ids = new int[vertAmount];
-            for (int i = 0; i < vertAmount; i++)
-            {
-                ids[i] = graph.VertexList[i].ID;
-                //Kosten zum Startknoten = 0
-                if (graph.VertexList[i].ID == startVert.ID)
-                {
-                    costs[i] = 0;
-                    startVertId = i;
-                }
-            }
-
-            //Queue und Done
-            List<int> queue = new List<int>();
-            queue.Add(startVertId);
-            List<int> done = new List<int>();
-
-            //Rumpf
-
-            //Wähle ersten Knoten aus
-            //! Schleife mit Abbruchbedingung queue.Count == 0
-            int currentVert = queue[0];
-            List<(int weight, int connectedVertex)> connectedVerts = graph.ConnectionDictionary[ids[currentVert]];
-            for (int i = 0; i < connectedVerts.Count; i++)
-            {
-
-
-                //falsch
-                if (costs[currentVert] == -1)
-                {
-                    //ich glaube das ist nicht richtig
-                    costs[currentVert] = connectedVerts[i].weight;
-                }
-                else
-                {
-                    int tempCost = costs[currentVert] + connectedVerts[i].weight;
-                    if (tempCost < costs[currentVert])
-                    {
-                        costs[currentVert] = tempCost;
-                        preds[currentVert] = connectedVerts[i].connectedVertex;
-                    }
-                }
-            }
-        }
-
 
         /*
         //Wikipedia
