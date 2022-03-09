@@ -31,6 +31,72 @@ namespace GD1020_Softwaretechnik
          *
          */
 
+        public int[] RunDijk2(GraphStructure graph, GraphStructure.Vertex startVert)
+        {
+            //Initialisierung
+            int vertAmount = graph.VertexList.Count;
+            int startVertId = 0;
+
+            //Kosten
+            int[] costs = new int[vertAmount];
+            for (int i = 0; i < vertAmount; i++)
+            {
+                costs[i] = -1;
+            }
+
+            //Vorgänger
+            int[] preds = new int[vertAmount];
+
+            //Startknoten
+            for (int i = 0; i < vertAmount; i++)
+            {
+                if (graph.VertexList[i].ID == startVert.ID)
+                {
+                    costs[i] = 0;
+                    startVertId = i;
+                }
+            }
+
+            //Queue und Done
+            List<int> queue = new List<int>();
+            queue.Add(startVertId);
+            List<int> done = new List<int>();
+
+            //Schleife
+            while (queue.Count > 0)
+            {
+                int currentVert = queue[0];
+                List<(int weight, int connectedVertex)> connectedVerts = graph.ConnectionDictionary[currentVert];
+                for (int i = 0; i < connectedVerts.Count; i++)
+                {
+                    int id = connectedVerts[i].connectedVertex;
+                    if (!done.Contains(id))
+                    {
+                        if (costs[id] == -1)
+                        {
+                            costs[id] = connectedVerts[i].weight + costs[currentVert];
+                        }
+                        else
+                        {
+                            if (connectedVerts[i].weight + costs[currentVert] < costs[id])
+                            {
+                                costs[id] = connectedVerts[i].weight + costs[currentVert];
+                            }
+                        }
+
+                        if (!queue.Contains(id))
+                        {
+                            queue.Add(id);
+                        }
+                    }
+                }
+                done.Add(currentVert);
+                queue.Remove(currentVert);
+            }
+
+            return costs;
+        }
+
         public void RunDijk(GraphStructure graph, GraphStructure.Vertex startVert)
         {
             //Initialisierung
