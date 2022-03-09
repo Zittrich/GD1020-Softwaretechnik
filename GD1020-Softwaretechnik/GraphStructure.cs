@@ -13,8 +13,20 @@ namespace GD1020_Softwaretechnik
     {
         static void Main(string[] args)
         {
-            GraphStructure graphStructure = new GraphStructure(null, null);
-            graphStructure = graphStructure.GenerateRandomGraph(100, 10, 10);
+            GraphStructure graphStructure = new GraphStructure(new Dictionary<int, List<(int weight, int connectedVertex)>>(), new List<GraphStructure.Vertex>());
+            graphStructure.InsertVertex(0);
+            graphStructure.InsertVertex(1);
+            graphStructure.InsertVertex(2);
+            graphStructure.InsertVertex(3);
+            graphStructure.InsertVertex(4);
+            graphStructure.ConnectVertices(0, 1, 100);
+            graphStructure.ConnectVertices(0, 3, 50);
+            graphStructure.ConnectVertices(1, 2, 100);
+            graphStructure.ConnectVertices(1, 4, 250);
+            graphStructure.ConnectVertices(2, 1, 100);
+            graphStructure.ConnectVertices(2, 4, 250);
+            graphStructure.ConnectVertices(3, 4, 50);
+
             graphStructure.PrintGraph();
             Console.ReadKey();
         }
@@ -25,20 +37,18 @@ namespace GD1020_Softwaretechnik
 
         //Dictionary mit T(zurück zu int?) und weight + connected Vert
         private Dictionary<int, List<(int weight, int connectedVertex)>> _connectionDictionary;
-
         public Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDictionary
         {
             get => _connectionDictionary;
-            set {}
+            private set {}
         }
 
         //Liste aller Vertices im Graphen
         private List<Vertex> _vertexList;
-
         public List<Vertex> VertexList
         {
             get => _vertexList;
-            set {}
+            private set {}
         }
 
         public GraphStructure(Dictionary<int, List<(int weight, int connectedVertex)>> connectionDictionary, List<Vertex> vertexList)
@@ -83,24 +93,30 @@ namespace GD1020_Softwaretechnik
                 for (int j = 0; j <= thisNeighborAmount; j++)
                 {
                     int weightRandom = random.Next(1, maximumWeight);
-                    int connectedRandomVertex = random.Next(i + 1 >= graphSize ? i : i + 1, Math.Min(maximumNeighbors + i, graphSize));
+                    int connectedVertex = Math.Min(i + j, graphSize - 1);
 
-                    for (int k = 0; k < thisList.Count; k++)
+                    for (int k = 0; k <= thisList.Count; k++)
                     {
-                        if (thisList[k] == (thisList[k].weight, connectedRandomVertex))
+                        try
                         {
-                            isDirty = true;
-                            break;
+                            if (thisList[k] == (thisList[k].weight, connectedVertex))
+                            {
+                                isDirty = true;
+                                break;
+                            }
                         }
-
-                        if (connectedRandomVertex == i)
+                        catch
                         {
-                            isDirty = true;
-                            break;
+                            if (connectedVertex == i)
+                            {
+                                isDirty = true;
+                                break;
+                            }
                         }
                     }
+
                     if(!isDirty)
-                        thisList.Add((weightRandom, connectedRandomVertex));
+                        thisList.Add((weightRandom, connectedVertex));
 
                     isDirty = false;
                 }
@@ -118,11 +134,16 @@ namespace GD1020_Softwaretechnik
 
         public void InsertVertex(int vertexID)
         {
-            if (_connectionDictionary.ContainsKey(vertexID))
-                throw new ArgumentException("Vertex ID already exists");
-
-            _vertexList.Add(new Vertex(vertexID));
-            _connectionDictionary.Add(vertexID, new List<(int, int)>());
+            try
+            {
+                if (_connectionDictionary.ContainsKey(vertexID))
+                    throw new ArgumentException("Vertex ID already exists");
+            }
+            finally
+            {
+                _vertexList.Add(new Vertex(vertexID));
+                _connectionDictionary.Add(vertexID, new List<(int, int)>());
+            }
         }
 
         public void DeleteVertex(int vertexID)
@@ -158,20 +179,32 @@ namespace GD1020_Softwaretechnik
         {
             if (_vertexList.Count < vertexA || _vertexList.Count < vertexB)
                 throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-            if (_connectionDictionary[vertexA].Contains((weight, vertexB)))
-                throw new ArgumentException("Connection already exists");
 
-            _connectionDictionary[vertexA].Add((weight, vertexB));
+            try
+            {
+                if (_connectionDictionary[vertexA].Contains((weight, vertexB)))
+                    throw new ArgumentException("Connection already exists");
+            }
+            finally
+            {
+                _connectionDictionary[vertexA].Add((weight, vertexB));
+            }
         }
 
         public void DisconnectVertices(int vertexA, int vertexB, int weight)
         {
             if (_vertexList.Count < vertexA || _vertexList.Count < vertexB)
                 throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-            if (!_connectionDictionary[vertexA].Contains((weight, vertexB)))
-                throw new ArgumentException("Connection does not exist");
 
-            _connectionDictionary[vertexA].Remove((weight, vertexB));
+            try
+            {
+                if (!_connectionDictionary[vertexA].Contains((weight, vertexB)))
+                    throw new ArgumentException("Connection does not exist");
+            }
+            finally
+            {
+                _connectionDictionary[vertexA].Remove((weight, vertexB));
+            }
         }
 
         //changeVertexInformation
