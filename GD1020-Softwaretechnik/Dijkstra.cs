@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace GD1020_Softwaretechnik
          *
          */
 
-        public int[] RunDijk(GraphStructure graph, GraphStructure.Vertex startVert)
+        public (int[] costs, int[] preds) RunDijk(GraphStructure graph, GraphStructure.Vertex startVert)
         {
             //Initialisierung
             int vertAmount = graph.VertexList.Count;
@@ -53,6 +54,7 @@ namespace GD1020_Softwaretechnik
                 if (graph.VertexList[i].ID == startVert.ID)
                 {
                     costs[i] = 0;
+                    preds[i] = -1;
                     startVertId = i;
                 }
             }
@@ -75,12 +77,14 @@ namespace GD1020_Softwaretechnik
                         if (costs[id] == -1)
                         {
                             costs[id] = connectedVerts[i].weight + costs[currentVert];
+                            preds[id] = currentVert;
                         }
                         else
                         {
                             if (connectedVerts[i].weight + costs[currentVert] < costs[id])
                             {
                                 costs[id] = connectedVerts[i].weight + costs[currentVert];
+                                preds[id] = currentVert;
                             }
                         }
 
@@ -94,7 +98,23 @@ namespace GD1020_Softwaretechnik
                 queue.Remove(currentVert);
             }
 
-            return costs;
+            return (costs, preds);
+        }
+
+        public List<int> BuildPath((int[] costs, int[] preds) input, GraphStructure.Vertex toVert)
+        {
+            List<int> output = new List<int>();
+            int currentVert = toVert.ID;
+            output.Add(currentVert);
+            while (input.preds[currentVert] != -1)
+            {
+                currentVert = input.preds[currentVert];
+                output.Add(currentVert);
+            }
+
+            output.Reverse();
+
+            return output;
         }
 
         /*
