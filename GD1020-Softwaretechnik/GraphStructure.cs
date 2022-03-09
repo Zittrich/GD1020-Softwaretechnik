@@ -24,17 +24,27 @@ namespace GD1020_Softwaretechnik
         internal Random random = new Random();
 
         //Dictionary mit T(zurück zu int?) und weight + connected Vert
-        public readonly Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDictionary;
-        //L: davor private
+        private Dictionary<int, List<(int weight, int connectedVertex)>> _connectionDictionary;
+
+        public Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDictionary
+        {
+            get => _connectionDictionary;
+            set {}
+        }
 
         //Liste aller Vertices im Graphen
-        public readonly List<Vertex> VertexList;
-        //L: davor private
+        private List<Vertex> _vertexList;
+
+        public List<Vertex> VertexList
+        {
+            get => _vertexList;
+            set {}
+        }
 
         public GraphStructure(Dictionary<int, List<(int weight, int connectedVertex)>> connectionDictionary, List<Vertex> vertexList)
         {
-            ConnectionDictionary = connectionDictionary;
-            VertexList = vertexList;
+            _connectionDictionary = connectionDictionary;
+            _vertexList = vertexList;
         }
 
         public class Vertex
@@ -49,7 +59,7 @@ namespace GD1020_Softwaretechnik
 
         public void PrintGraph()
         {
-            foreach (KeyValuePair<int, List<(int weight, int connectedVertex)>> keyValuePair in ConnectionDictionary)
+            foreach (KeyValuePair<int, List<(int weight, int connectedVertex)>> keyValuePair in _connectionDictionary)
             {
                 Console.Write($"Vertex: {keyValuePair.Key} || ");
                 foreach (var t in keyValuePair.Value)
@@ -65,7 +75,7 @@ namespace GD1020_Softwaretechnik
             GraphStructure graphStructure = new GraphStructure(new Dictionary<int, List<(int weight, int connectedVertex)>>(), new List<Vertex>());
             for (int i = 0; i < graphSize; i++)
             {
-                graphStructure.VertexList.Add(new Vertex(i));
+                graphStructure._vertexList.Add(new Vertex(i));
 
                 bool isDirty = false;
                 int thisNeighborAmount = random.Next(1, maximumNeighbors);
@@ -94,7 +104,7 @@ namespace GD1020_Softwaretechnik
 
                     isDirty = false;
                 }
-                graphStructure.ConnectionDictionary.Add(i, thisList);
+                graphStructure._connectionDictionary.Add(i, thisList);
             }
 
             return graphStructure;
@@ -102,42 +112,42 @@ namespace GD1020_Softwaretechnik
 
         public void MakeNull()
         {
-            VertexList = null;
-            ConnectionDictionary = null;
+            _vertexList = null;
+            _connectionDictionary = null;
         }
 
         public void InsertVertex(int vertexID)
         {
-            if (ConnectionDictionary.ContainsKey(vertexID))
+            if (_connectionDictionary.ContainsKey(vertexID))
                 throw new ArgumentException("Vertex ID already exists");
 
-            VertexList.Add(new Vertex(vertexID));
-            ConnectionDictionary.Add(vertexID, new List<(int, int)>());
+            _vertexList.Add(new Vertex(vertexID));
+            _connectionDictionary.Add(vertexID, new List<(int, int)>());
         }
 
         public void DeleteVertex(int vertexID)
         {
-            if (!ConnectionDictionary.ContainsKey(vertexID))
+            if (!_connectionDictionary.ContainsKey(vertexID))
                 throw new ArgumentException("Vertex ID does not exist");
 
-            foreach(Vertex vertex in VertexList)
+            foreach(Vertex vertex in _vertexList)
             {
                 if(vertex.ID == vertexID)
                 {
-                    VertexList.Remove(vertex);
+                    _vertexList.Remove(vertex);
                     break;
                 }
             }
 
-            ConnectionDictionary.Remove(vertexID);
+            _connectionDictionary.Remove(vertexID);
 
-            foreach (KeyValuePair<int, List<(int,int)>> keyValuePair in ConnectionDictionary)
+            foreach (KeyValuePair<int, List<(int,int)>> keyValuePair in _connectionDictionary)
             {
                 foreach((int weight, int connectedVertex) valuePair in keyValuePair.Value)
                 {
                     if (valuePair == (valuePair.weight, vertexID))
                     {
-                        ConnectionDictionary.Remove(keyValuePair.Key);
+                        _connectionDictionary.Remove(keyValuePair.Key);
                     }
                 }
                 //for schleife statt for each
@@ -146,22 +156,22 @@ namespace GD1020_Softwaretechnik
 
         public void ConnectVertices(int vertexA, int vertexB, int weight)
         {
-            if (VertexList.Count < vertexA || VertexList.Count < vertexB)
+            if (_vertexList.Count < vertexA || _vertexList.Count < vertexB)
                 throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-            if (ConnectionDictionary[vertexA].Contains((vertexB, weight)))
+            if (_connectionDictionary[vertexA].Contains((weight, vertexB)))
                 throw new ArgumentException("Connection already exists");
 
-            ConnectionDictionary[vertexA].Add((vertexB, weight));
+            _connectionDictionary[vertexA].Add((weight, vertexB));
         }
 
         public void DisconnectVertices(int vertexA, int vertexB, int weight)
         {
-            if (VertexList.Count < vertexA || VertexList.Count < vertexB)
+            if (_vertexList.Count < vertexA || _vertexList.Count < vertexB)
                 throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-            if (!ConnectionDictionary[vertexA].Contains((vertexB, weight)))
+            if (!_connectionDictionary[vertexA].Contains((weight, vertexB)))
                 throw new ArgumentException("Connection does not exist");
 
-            ConnectionDictionary[vertexA].Remove((vertexB, weight));
+            _connectionDictionary[vertexA].Remove((weight, vertexB));
         }
 
         //changeVertexInformation
