@@ -28,10 +28,24 @@ namespace GD1020_Softwaretechnik
             graphStructure.ConnectVertices(3, 4, 250);
 
             Dijkstra dijk = new Dijkstra();
-            int[] output = dijk.RunDijk(graphStructure, graphStructure.VertexList[0]);
-            foreach (int cost in output)
+            (int[] costs, int[] preds) output = dijk.RunDijk(graphStructure, graphStructure.VertexList[0]);
+            Console.WriteLine("Kosten:");
+            foreach (int cost in output.costs)
             {
                 Console.WriteLine(cost);
+            }
+
+            Console.WriteLine("Vorgänger:");
+            foreach (int pred in output.preds)
+            {
+                Console.WriteLine(pred);
+            }
+
+            Console.WriteLine("Weg:");
+            List<int> path = dijk.BuildPath(output, graphStructure.VertexList[4]);
+            foreach (int i in path)
+            {
+                Console.WriteLine(i);
             }
 
             graphStructure.PrintGraph();
