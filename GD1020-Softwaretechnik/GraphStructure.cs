@@ -152,7 +152,7 @@ namespace GD1020_Softwaretechnik
 
         public void InsertMultipleVertices(int[] verticesID)
         {
-            for (int i = 0; i <= verticesID.Length; i++)
+            for (int i = 0; i < verticesID.Length; i++)
             {
                 InsertVertex(i);
             }
@@ -203,19 +203,19 @@ namespace GD1020_Softwaretechnik
             }
         }
 
-        public void DisconnectVertices(int vertexA, int vertexB, int weight)
+        public void DisconnectVertices(int vertexA, int vertexB)
         {
             if (_vertexList.Count < vertexA || _vertexList.Count < vertexB)
                 throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
 
-            try
+            List<(int weight, int connectedVertex)> thisList = _connectionDictionary[vertexA];
+            for (int i = 0; i < thisList.Count; i++)
             {
-                if (!_connectionDictionary[vertexA].Contains((weight, vertexB)))
-                    throw new ArgumentException("Connection does not exist");
-            }
-            finally
-            {
-                _connectionDictionary[vertexA].Remove((weight, vertexB));
+                if (thisList[i].connectedVertex == vertexB)
+                {
+                    thisList.Remove((thisList[i].weight, i));
+                    break;
+                }
             }
         }
 

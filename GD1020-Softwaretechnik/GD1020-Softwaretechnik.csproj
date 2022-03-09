@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>GD1020_Softwaretechnik.Program</StartupObject>
+    <StartupObject>GD1020_Softwaretechnik.Kruskal</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
