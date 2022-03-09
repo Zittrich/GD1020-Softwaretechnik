@@ -125,6 +125,14 @@ namespace GD1020_Softwaretechnik
             foreach (int pred in output.preds)
             {
                 Console.WriteLine(pred);
+                //if (pred == -1)
+                //{
+                //    Console.WriteLine("Start");
+                //}
+                //else
+                //{
+                //    Console.WriteLine(pred);
+                //}
             }
 
             Console.WriteLine("Weg:");
