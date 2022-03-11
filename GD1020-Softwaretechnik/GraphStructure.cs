@@ -9,26 +9,28 @@ using System.Threading.Tasks;
 
 namespace GD1020_Softwaretechnik
 {
-    public class GraphStructure
+    public class GraphStructure<T>
     {
         internal Random random = new Random();
 
         //Dictionary mit T(zurück zu int?) und weight + connected Vert
-        private Dictionary<Vertex, List<(int weight, Vertex connectedVertex)>> _connectionDictionary;
-        public Dictionary<Vertex, List<(int weight, Vertex connectedVertex)>> ConnectionDictionary
+        private Dictionary<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>> _connectionDictionary;
+        public Dictionary<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>> ConnectionDictionary
         {
             get => _connectionDictionary;
             private set {}
         }
 
-        public GraphStructure(Dictionary<Vertex, List<(int weight, Vertex connectedVertex)>> connectionDictionary, List<Vertex> vertexList)
+        public GraphStructure()
         {
-            _connectionDictionary = connectionDictionary;
+            _connectionDictionary = new Dictionary<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>>();
         }
 
-        public class Vertex
+        public class Vertex<T2>
         {
             public readonly int ID;
+            private T container;
+            public T Container { get { return container; } set { container = value; } }
 
             public Vertex(int id)
             {
@@ -38,7 +40,7 @@ namespace GD1020_Softwaretechnik
 
         public void PrintGraph()
         {
-            foreach (KeyValuePair<Vertex, List<(int weight, Vertex connectedVertex)>> keyValuePair in _connectionDictionary)
+            foreach (KeyValuePair<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>> keyValuePair in _connectionDictionary)
             {
                 Console.Write($"Vertex: {keyValuePair.Key} || ");
                 foreach (var t in keyValuePair.Value)
@@ -50,9 +52,9 @@ namespace GD1020_Softwaretechnik
         }
 
         //Cant work since it only generates a root with neighbours which never get used
-        public GraphStructure GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight)
+        public void GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight)
         {
-            return null;
+
         }
 
         public void InsertVertex(int vertexID)
@@ -61,14 +63,14 @@ namespace GD1020_Softwaretechnik
             {
                 if (_connectionDictionary.Count > 0 && (from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First() != null)
                     throw new ArgumentException("Vertex ID already exists");
-                _connectionDictionary.Add(new Vertex(vertexID), new List<(int, Vertex)>());
+                _connectionDictionary.Add(new Vertex<T>(vertexID), new List<(int, Vertex<T>)>());
             }catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
         }
 
-        public void InsertVertex(Vertex vertex)
+        public void InsertVertex(Vertex<T> vertex)
         {
             try
             {
@@ -76,7 +78,7 @@ namespace GD1020_Softwaretechnik
                     throw new ArgumentException("Vertex ID already exists");
                 if (_connectionDictionary.ContainsKey(vertex))
                     throw new ArgumentException("Vertex ID already exists");
-                _connectionDictionary.Add(vertex, new List<(int, Vertex)>());
+                _connectionDictionary.Add(vertex, new List<(int, Vertex<T>)>());
             }
             catch (Exception ex)
             {
@@ -97,12 +99,12 @@ namespace GD1020_Softwaretechnik
             if(_connectionDictionary.Count > 0) _connectionDictionary.Remove((from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First());
         }
 
-        public void DeleteVertex(Vertex vertex)
+        public void DeleteVertex(Vertex<T> vertex)
         {
             _connectionDictionary.Remove(vertex);
         }
 
-        public void ConnectVertices(Vertex vertexA, Vertex vertexB, int weight)
+        public void ConnectVertices(Vertex<T> vertexA, Vertex<T> vertexB, int weight)
         {
             try
             {
@@ -118,7 +120,7 @@ namespace GD1020_Softwaretechnik
             }
         }
 
-        public void DisconnectVertices(Vertex vertexA, Vertex vertexB)
+        public void DisconnectVertices(Vertex<T> vertexA, Vertex<T> vertexB)
         {
             try
             {

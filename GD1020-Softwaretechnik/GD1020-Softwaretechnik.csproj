@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractGraphStructure.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Dijkstra.cs" />
     <Compile Include="ExampleClass.cs" />
     <Compile Include="GraphStructure.cs" />
