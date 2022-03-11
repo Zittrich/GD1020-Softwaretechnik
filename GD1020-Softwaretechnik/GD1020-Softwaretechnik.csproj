@@ -52,6 +52,7 @@
     <Compile Include="GraphStructure.cs" />
     <Compile Include="Kruskal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UndirectedGraphStructure.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
