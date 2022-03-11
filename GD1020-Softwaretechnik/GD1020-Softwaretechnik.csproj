@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>GD1020_Softwaretechnik.Kruskal</StartupObject>
+    <StartupObject>GD1020_Softwaretechnik.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractGraphStructure.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Dijkstra.cs" />
     <Compile Include="ExampleClass.cs" />
     <Compile Include="GraphStructure.cs" />

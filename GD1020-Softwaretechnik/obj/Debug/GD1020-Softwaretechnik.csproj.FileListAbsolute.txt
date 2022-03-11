@@ -12,3 +12,11 @@ D:\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechni
 D:\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csproj.CoreCompileInputs.cache
 D:\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.exe
 D:\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.pdb
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csproj.AssemblyReference.cache
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csproj.SuggestedBindingRedirects.cache
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.csproj.CoreCompileInputs.cache
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.exe
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\obj\Debug\GD1020-Softwaretechnik.pdb
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\bin\Debug\GD1020-Softwaretechnik.exe.config
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\bin\Debug\GD1020-Softwaretechnik.exe
+D:\Repos\Uni\3\Software Eng\GD1020-Softwaretechnik\GD1020-Softwaretechnik\bin\Debug\GD1020-Softwaretechnik.pdb

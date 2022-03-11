@@ -9,12 +9,6 @@ using System.Threading.Tasks;
 
 namespace GD1020_Softwaretechnik
 {
-    public class Program
-    {
-        static void Main(string[] args)
-        {
-        }
-    }
     public class GraphStructure
     {
         internal Random random = new Random();
@@ -65,13 +59,12 @@ namespace GD1020_Softwaretechnik
         {
             try
             {
-                var keyExists = (from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First();
-                if (keyExists != null)
+                if (_connectionDictionary.Count > 0 && (from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First() != null)
                     throw new ArgumentException("Vertex ID already exists");
                 _connectionDictionary.Add(new Vertex(vertexID), new List<(int, Vertex)>());
             }catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.ToString());
             }
         }
 
@@ -79,7 +72,7 @@ namespace GD1020_Softwaretechnik
         {
             try
             {
-                if ((from vertexComparison in _connectionDictionary.Keys where vertexComparison.ID.Equals(vertex.ID) select vertexComparison).First() != null)
+                if (_connectionDictionary.Count > 0 && (from vertexComparison in _connectionDictionary.Keys where vertexComparison.ID.Equals(vertex.ID) select vertexComparison).First() != null)
                     throw new ArgumentException("Vertex ID already exists");
                 if (_connectionDictionary.ContainsKey(vertex))
                     throw new ArgumentException("Vertex ID already exists");
@@ -87,7 +80,7 @@ namespace GD1020_Softwaretechnik
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.ToString());
             }
         }
 
@@ -101,7 +94,7 @@ namespace GD1020_Softwaretechnik
 
         public void DeleteVertex(int vertexID)
         {
-            _connectionDictionary.Remove((from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First());
+            if(_connectionDictionary.Count > 0) _connectionDictionary.Remove((from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First());
         }
 
         public void DeleteVertex(Vertex vertex)
@@ -115,7 +108,7 @@ namespace GD1020_Softwaretechnik
             {
                 if (!_connectionDictionary.Keys.Contains(vertexA) || !_connectionDictionary.Keys.Contains(vertexB))
                     throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-                if ((from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First().connectedVertex != null)
+                if (_connectionDictionary.Count > 0 && (from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First().connectedVertex != null)
                     throw new ArgumentException("Connection already exists");
                 _connectionDictionary[vertexA].Add((weight, vertexB));
             }
@@ -131,8 +124,8 @@ namespace GD1020_Softwaretechnik
             {
                 if (!_connectionDictionary.Keys.Contains(vertexA) || !_connectionDictionary.Keys.Contains(vertexB))
                     throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-                _connectionDictionary[vertexA].Remove((from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First());
-                _connectionDictionary[vertexB].Remove((from vertexItem in _connectionDictionary[vertexB] where vertexItem.connectedVertex.Equals(vertexA) select vertexItem).First());
+                if (_connectionDictionary.Count > 0) _connectionDictionary[vertexA].Remove((from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First());
+                if (_connectionDictionary.Count > 0) _connectionDictionary[vertexB].Remove((from vertexItem in _connectionDictionary[vertexB] where vertexItem.connectedVertex.Equals(vertexA) select vertexItem).First());
             }
             catch (Exception ex)
             {
