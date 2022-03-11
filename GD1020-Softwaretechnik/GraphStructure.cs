@@ -13,26 +13,6 @@ namespace GD1020_Softwaretechnik
     {
         static void Main(string[] args)
         {
-            //Beispielgraph
-            GraphStructure graphStructure = new GraphStructure(new Dictionary<int, List<(int weight, int connectedVertex)>>(), new List<GraphStructure.Vertex>());
-            graphStructure.InsertVertex(0);
-            graphStructure.InsertVertex(1);
-            graphStructure.InsertVertex(2);
-            graphStructure.InsertVertex(3);
-            graphStructure.InsertVertex(4);
-            graphStructure.ConnectVertices(0, 1, 100);
-            graphStructure.ConnectVertices(0, 3, 50);
-            graphStructure.ConnectVertices(1, 2, 100);
-            graphStructure.ConnectVertices(1, 4, 250);
-            graphStructure.ConnectVertices(2, 4, 50);
-            graphStructure.ConnectVertices(3, 1, 100);
-            graphStructure.ConnectVertices(3, 4, 250);
-
-            Dijkstra dijk = new Dijkstra();
-            dijk.PrintDijk(graphStructure);
-
-            graphStructure.PrintGraph();
-            Console.ReadKey();
         }
     }
     public class GraphStructure
@@ -40,30 +20,21 @@ namespace GD1020_Softwaretechnik
         internal Random random = new Random();
 
         //Dictionary mit T(zurück zu int?) und weight + connected Vert
-        private Dictionary<int, List<(int weight, int connectedVertex)>> _connectionDictionary;
-        public Dictionary<int, List<(int weight, int connectedVertex)>> ConnectionDictionary
+        private Dictionary<Vertex, List<(int weight, Vertex connectedVertex)>> _connectionDictionary;
+        public Dictionary<Vertex, List<(int weight, Vertex connectedVertex)>> ConnectionDictionary
         {
             get => _connectionDictionary;
             private set {}
         }
 
-        //Liste aller Vertices im Graphen
-        private List<Vertex> _vertexList;
-        public List<Vertex> VertexList
-        {
-            get => _vertexList;
-            private set {}
-        }
-
-        public GraphStructure(Dictionary<int, List<(int weight, int connectedVertex)>> connectionDictionary, List<Vertex> vertexList)
+        public GraphStructure(Dictionary<Vertex, List<(int weight, Vertex connectedVertex)>> connectionDictionary, List<Vertex> vertexList)
         {
             _connectionDictionary = connectionDictionary;
-            _vertexList = vertexList;
         }
 
         public class Vertex
         {
-            public  readonly int ID;
+            public readonly int ID;
 
             public Vertex(int id)
             {
@@ -73,7 +44,7 @@ namespace GD1020_Softwaretechnik
 
         public void PrintGraph()
         {
-            foreach (KeyValuePair<int, List<(int weight, int connectedVertex)>> keyValuePair in _connectionDictionary)
+            foreach (KeyValuePair<Vertex, List<(int weight, Vertex connectedVertex)>> keyValuePair in _connectionDictionary)
             {
                 Console.Write($"Vertex: {keyValuePair.Key} || ");
                 foreach (var t in keyValuePair.Value)
@@ -84,69 +55,39 @@ namespace GD1020_Softwaretechnik
             }
         }
 
+        //Cant work since it only generates a root with neighbours which never get used
         public GraphStructure GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight)
         {
-            GraphStructure graphStructure = new GraphStructure(new Dictionary<int, List<(int weight, int connectedVertex)>>(), new List<Vertex>());
-            for (int i = 0; i < graphSize; i++)
-            {
-                graphStructure._vertexList.Add(new Vertex(i));
-
-                bool isDirty = false;
-                int thisNeighborAmount = random.Next(1, maximumNeighbors);
-                List<(int weight, int connectedVertex)> thisList = new List<(int, int)>();
-                for (int j = 0; j <= thisNeighborAmount; j++)
-                {
-                    int weightRandom = random.Next(1, maximumWeight);
-                    int connectedVertex = Math.Min(i + j, graphSize - 1);
-
-                    for (int k = 0; k <= thisList.Count; k++)
-                    {
-                        try
-                        {
-                            if (thisList[k] == (thisList[k].weight, connectedVertex))
-                            {
-                                isDirty = true;
-                                break;
-                            }
-                        }
-                        catch
-                        {
-                            if (connectedVertex == i)
-                            {
-                                isDirty = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if(!isDirty)
-                        thisList.Add((weightRandom, connectedVertex));
-
-                    isDirty = false;
-                }
-                graphStructure._connectionDictionary.Add(i, thisList);
-            }
-
-            return graphStructure;
-        }
-
-        public void MakeNull()
-        {
-            _vertexList = null;
-            _connectionDictionary = null;
+            return null;
         }
 
         public void InsertVertex(int vertexID)
         {
             try
             {
-                if (_connectionDictionary.ContainsKey(vertexID))
+                var keyExists = (from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First();
+                if (keyExists != null)
                     throw new ArgumentException("Vertex ID already exists");
-            }
-            finally
+                _connectionDictionary.Add(new Vertex(vertexID), new List<(int, Vertex)>());
+            }catch (Exception ex)
             {
-                _vertexList.Add(new Vertex(vertexID));
-                _connectionDictionary.Add(vertexID, new List<(int, int)>());
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void InsertVertex(Vertex vertex)
+        {
+            try
+            {
+                if ((from vertexComparison in _connectionDictionary.Keys where vertexComparison.ID.Equals(vertex.ID) select vertexComparison).First() != null)
+                    throw new ArgumentException("Vertex ID already exists");
+                if (_connectionDictionary.ContainsKey(vertex))
+                    throw new ArgumentException("Vertex ID already exists");
+                _connectionDictionary.Add(vertex, new List<(int, Vertex)>());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -154,68 +95,48 @@ namespace GD1020_Softwaretechnik
         {
             for (int i = 0; i < verticesID.Length; i++)
             {
-                InsertVertex(i);
+                InsertVertex(verticesID[i]);
             }
         }
 
         public void DeleteVertex(int vertexID)
         {
-            if (!_connectionDictionary.ContainsKey(vertexID))
-                throw new ArgumentException("Vertex ID does not exist");
-
-            foreach(Vertex vertex in _vertexList)
-            {
-                if(vertex.ID == vertexID)
-                {
-                    _vertexList.Remove(vertex);
-                    break;
-                }
-            }
-
-            _connectionDictionary.Remove(vertexID);
-
-            foreach (KeyValuePair<int, List<(int,int)>> keyValuePair in _connectionDictionary)
-            {
-                foreach((int weight, int connectedVertex) valuePair in keyValuePair.Value)
-                {
-                    if (valuePair == (valuePair.weight, vertexID))
-                    {
-                        _connectionDictionary.Remove(keyValuePair.Key);
-                    }
-                }
-                //for schleife statt for each
-            }
+            _connectionDictionary.Remove((from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First());
         }
 
-        public void ConnectVertices(int vertexA, int vertexB, int weight)
+        public void DeleteVertex(Vertex vertex)
         {
-            if (_vertexList.Count < vertexA || _vertexList.Count < vertexB)
-                throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
+            _connectionDictionary.Remove(vertex);
+        }
 
+        public void ConnectVertices(Vertex vertexA, Vertex vertexB, int weight)
+        {
             try
             {
-                if (_connectionDictionary[vertexA].Contains((weight, vertexB)))
+                if (!_connectionDictionary.Keys.Contains(vertexA) || !_connectionDictionary.Keys.Contains(vertexB))
+                    throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
+                if ((from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First().connectedVertex != null)
                     throw new ArgumentException("Connection already exists");
-            }
-            finally
-            {
                 _connectionDictionary[vertexA].Add((weight, vertexB));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
-        public void DisconnectVertices(int vertexA, int vertexB)
+        public void DisconnectVertices(Vertex vertexA, Vertex vertexB)
         {
-            if (_vertexList.Count < vertexA || _vertexList.Count < vertexB)
-                throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-
-            List<(int weight, int connectedVertex)> thisList = _connectionDictionary[vertexA];
-            for (int i = 0; i < thisList.Count; i++)
+            try
             {
-                if (thisList[i].connectedVertex == vertexB)
-                {
-                    thisList.Remove((thisList[i].weight, i));
-                    break;
-                }
+                if (!_connectionDictionary.Keys.Contains(vertexA) || !_connectionDictionary.Keys.Contains(vertexB))
+                    throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
+                _connectionDictionary[vertexA].Remove((from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First());
+                _connectionDictionary[vertexB].Remove((from vertexItem in _connectionDictionary[vertexB] where vertexItem.connectedVertex.Equals(vertexA) select vertexItem).First());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
