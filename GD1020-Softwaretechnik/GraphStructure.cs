@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace GD1020_Softwaretechnik
 {
+    /// <summary>
+    /// The main graph. T defines the type of the container which can hold more information within a vertex.
+    /// </summary>
+    /// <typeparam name="Type of the container"></typeparam>
     public class GraphStructure<T>
     {
         internal Random random = new Random();
@@ -26,18 +30,24 @@ namespace GD1020_Softwaretechnik
             _connectionDictionary = new Dictionary<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>>();
         }
 
-        public class Vertex<T2>
+        /// <summary>
+        /// An object of this class acts as a node of the graph.
+        /// </summary>
+        /// <typeparam name="Type of the container"></typeparam>
+        public class Vertex<ContainerType>
         {
             public readonly int ID;
-            private T container;
-            public T Container { get { return container; } set { container = value; } }
+            private ContainerType container;
+            public ContainerType Container { get { return container; } set { container = value; } }
 
             public Vertex(int id)
             {
                 ID = id;
             }
         }
-
+        /// <summary>
+        /// Prints the graph as text in the synatx: RootID || [weight, First-NeighbourID]; [weight, Second-NeighbourID]; [...]
+        /// </summary>
         public void PrintGraph()
         {
             foreach (KeyValuePair<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>> keyValuePair in _connectionDictionary)
@@ -51,7 +61,28 @@ namespace GD1020_Softwaretechnik
             }
         }
 
-        //TODO sometimes maximumNeighbors+1 neighbors
+        /// <summary>
+        /// Generates a random graph based on the input values.
+        /// <paramref name="graphSize"/> The amount of vertices the graph should have.
+        /// <list type="bullet">
+        /// <item>
+        /// <description><paramref name="graphSize"/>: The amount of vertices the graph should have.</description>
+        /// </item>
+        /// <item>
+        /// <description><paramref name="maximumNeighbors"/>: The maximum amount a neighbours a vertex should have. The minimum is one.</description>
+        /// </item>
+        /// <item>
+        /// <description><paramref name="maximumWeight"/>: The maximum weight the describes a connection between to vertices.</description>
+        /// </item>
+        /// <item>
+        /// <description><paramref name="minimumWeight"/>: The minimum weight the describes a connection between to vertices.</description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="graphSize"></param>
+        /// <param name="maximumNeighbors"></param>
+        /// <param name="maximumWeight"></param>
+        /// <param name="minimumWeight"></param>
         public void GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight, int minimumWeight)
         {
             Dictionary<Vertex<T>, int> possibleNeighbours = new Dictionary<Vertex<T>, int>();
@@ -124,6 +155,10 @@ namespace GD1020_Softwaretechnik
             }
         }
 
+        /// <summary>
+        /// Checks whether the graph is complete within itself and one whole without isolations.
+        /// </summary>
+        /// <returns>True if its whole, false if not</returns>
         public bool checkComplete()
         {
             HashSet<Vertex<T>> all = new HashSet<Vertex<T>>();
@@ -146,6 +181,11 @@ namespace GD1020_Softwaretechnik
             return all;
         }
 
+        /// <summary>
+        /// Inserts a new vertex with a given ID. If the ID already exists, information is printed out and the vertex is not being added.
+        /// </summary>
+        /// <param name="vertexID"></param>
+        /// <returns></returns>
         public Vertex<T> InsertVertex(int vertexID)
         {
             Vertex<T> current = null;
@@ -162,6 +202,11 @@ namespace GD1020_Softwaretechnik
             return current;
         }
 
+        /// <summary>
+        /// Inserts a new given vertex. If the ID of the vertex already exists, information is printed out and the vertex is not being added.
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
         public void InsertVertex(Vertex<T> vertex)
         {
             try
@@ -178,6 +223,10 @@ namespace GD1020_Softwaretechnik
             }
         }
 
+        /// <summary>
+        /// Inserts multiple vertices by a given array of IDs. If an ID of a vertex already exists, it won't be added.
+        /// </summary>
+        /// <param name="verticesID"></param>
         public void InsertMultipleVertices(int[] verticesID)
         {
             for (int i = 0; i < verticesID.Length; i++)
@@ -186,17 +235,32 @@ namespace GD1020_Softwaretechnik
             }
         }
 
+        /// <summary>
+        /// Removes a vertex by a given ID. This can lead to the graph being split!
+        /// </summary>
+        /// <param name="vertexID"></param>
         public void DeleteVertex(int vertexID)
         {
             IEnumerable<Vertex<T>> sequence = (from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex);
             if (sequence.Any()) _connectionDictionary.Remove(sequence.First());
         }
 
+        /// <summary>
+        ///  Removes a given vertex. This can lead to the graph being split!
+        /// </summary>
+        /// <param name="vertex"></param>
         public void DeleteVertex(Vertex<T> vertex)
         {
             _connectionDictionary.Remove(vertex);
         }
 
+        /// <summary>
+        /// Connects <paramref name="vertexA"/> to <paramref name="vertexB"/> with the given <paramref name="weight"/>.
+        /// </summary>
+        /// <param name="vertexA"></param>
+        /// <param name="vertexB"></param>
+        /// <param name="weight"></param>
+        /// <returns></returns>
         public bool ConnectVertices(Vertex<T> vertexA, Vertex<T> vertexB, int weight)
         {
             try
@@ -214,7 +278,13 @@ namespace GD1020_Softwaretechnik
             }
             return true;
         }
-
+        /// <summary>
+        /// Disconnects <paramref name="vertexA"/> from <paramref name="vertexB"/>. This can lead to the graph being split!
+        /// </summary>
+        /// <param name="vertexA"></param>
+        /// <param name="vertexB"></param>
+        /// <param name="weight"></param>
+        /// <returns></returns>
         public void DisconnectVertices(Vertex<T> vertexA, Vertex<T> vertexB)
         {
             try
