@@ -10,6 +10,10 @@ namespace GD1020_Softwaretechnik
     {
         static void Main(string[] args)
         {
+            GraphStructure<int> graphStructure = new GraphStructure<int>();
+            graphStructure.GenerateRandomGraph(6, 3, 10, 5);
+            graphStructure.PrintGraph();
+            Console.ReadLine();
         }
     }
 

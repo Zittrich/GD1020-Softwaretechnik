@@ -42,39 +42,104 @@ namespace GD1020_Softwaretechnik
         {
             foreach (KeyValuePair<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>> keyValuePair in _connectionDictionary)
             {
-                Console.Write($"Vertex: {keyValuePair.Key} || ");
+                Console.Write($"Vertex: {keyValuePair.Key.ID} || ");
                 foreach (var t in keyValuePair.Value)
                 {
-                    Console.Write($"[Weight: {t.weight}, Vertex: {t.connectedVertex}]; ");
+                    Console.Write($"[Weight: {t.weight}, Vertex: {t.connectedVertex.ID}]; ");
                 }
                 Console.WriteLine();
             }
         }
 
-        //Cant work since it only generates a root with neighbours which never get used
-        public void GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight)
+        //TODO fix while(true) and unlimited neighbour size
+        public void GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight, int minimumWeight)
+        {
+            Dictionary<Vertex<T>, int> possibleNeighbours = new Dictionary<Vertex<T>, int>();
+            List<Vertex<T>> unused = new List<Vertex<T>>();
+            List<Vertex<T>> all = new List<Vertex<T>>();
+            Vertex<T> current = null;
+            //Generate every vertex
+            for (int i = 0; i < graphSize; i++)
+            {
+                current = InsertVertex(i);
+                possibleNeighbours.Add(current, maximumNeighbors-1);
+                unused.Add(current);
+                all.Add(current);
+            }
+            current = unused.First();
+            unused.Remove(current);
+            while (current != null)
+            {
+                Vertex<T> next = null;
+                int randomNeighbourCount = possibleNeighbours[current] == 0 ? 0 : random.Next(possibleNeighbours[current])+1;
+                HashSet<Vertex<T>> uniqueNeighbours = new HashSet<Vertex<T>>();
+                uniqueNeighbours.Add(current);
+                for (int i = 0; i < randomNeighbourCount; i++)
+                {
+                    Vertex<T> newNeighbour = null;
+                    do
+                    {
+                        newNeighbour = all[random.Next(all.Count)];
+                    } while (uniqueNeighbours.Contains(newNeighbour) || possibleNeighbours[newNeighbour] == 0);
+
+                    Console.WriteLine(current.ID + "->" + newNeighbour.ID);
+                    uniqueNeighbours.Add(newNeighbour);
+                    int randomWeight = minimumWeight + ((maximumWeight - minimumWeight) == 0 ? 0 : random.Next(maximumWeight-minimumWeight));
+                    if (unused.Contains(newNeighbour)) next = newNeighbour;
+                    ConnectVertices(current, newNeighbour, randomWeight);
+                    possibleNeighbours[current]--; 
+                    ConnectVertices(newNeighbour, current, randomWeight);
+                    possibleNeighbours[newNeighbour]--;
+                }
+                if (unused.Count != 0)
+                {
+                    if(next == null)
+                    {
+                        do
+                        {
+                            next = unused[random.Next(unused.Count)];
+                        } while (uniqueNeighbours.Contains(next) || possibleNeighbours[next] == 0);
+                        int randomWeight = minimumWeight + random.Next(maximumWeight - minimumWeight);
+                        Console.WriteLine(current.ID + "->" + next.ID);
+                        ConnectVertices(current, next, randomWeight);
+                        ConnectVertices(next, current, randomWeight);
+                    }
+                    current = next;
+                }
+                else
+                {
+                    current = null;
+                }
+                unused.Remove(current);
+            }
+        }
+
+        public void GenerateRandomGridGraph(int graphSize, int maximumNeighbors, int maximumWeight)
         {
 
         }
 
-        public void InsertVertex(int vertexID)
+        public Vertex<T> InsertVertex(int vertexID)
         {
+            Vertex<T> current = null;
             try
             {
-                if (_connectionDictionary.Count > 0 && (from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First() != null)
+                if ((from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).Any())
                     throw new ArgumentException("Vertex ID already exists");
-                _connectionDictionary.Add(new Vertex<T>(vertexID), new List<(int, Vertex<T>)>());
+                current = new Vertex<T>(vertexID);
+                _connectionDictionary.Add(current, new List<(int, Vertex<T>)>());
             }catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
+            return current;
         }
 
         public void InsertVertex(Vertex<T> vertex)
         {
             try
             {
-                if (_connectionDictionary.Count > 0 && (from vertexComparison in _connectionDictionary.Keys where vertexComparison.ID.Equals(vertex.ID) select vertexComparison).First() != null)
+                if ((from vertexComparison in _connectionDictionary.Keys where vertexComparison.ID.Equals(vertex.ID) select vertexComparison).Any())
                     throw new ArgumentException("Vertex ID already exists");
                 if (_connectionDictionary.ContainsKey(vertex))
                     throw new ArgumentException("Vertex ID already exists");
@@ -96,7 +161,8 @@ namespace GD1020_Softwaretechnik
 
         public void DeleteVertex(int vertexID)
         {
-            if(_connectionDictionary.Count > 0) _connectionDictionary.Remove((from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex).First());
+            IEnumerable<Vertex<T>> sequence = (from vertex in _connectionDictionary.Keys where vertex.ID.Equals(vertexID) select vertex);
+            if (sequence.Any()) _connectionDictionary.Remove(sequence.First());
         }
 
         public void DeleteVertex(Vertex<T> vertex)
@@ -110,7 +176,7 @@ namespace GD1020_Softwaretechnik
             {
                 if (!_connectionDictionary.Keys.Contains(vertexA) || !_connectionDictionary.Keys.Contains(vertexB))
                     throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-                if (_connectionDictionary.Count > 0 && (from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First().connectedVertex != null)
+                if ((from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).Any())
                     throw new ArgumentException("Connection already exists");
                 _connectionDictionary[vertexA].Add((weight, vertexB));
             }
@@ -126,8 +192,10 @@ namespace GD1020_Softwaretechnik
             {
                 if (!_connectionDictionary.Keys.Contains(vertexA) || !_connectionDictionary.Keys.Contains(vertexB))
                     throw new IndexOutOfRangeException("At least one of the given Vertices does not exist");
-                if (_connectionDictionary.Count > 0) _connectionDictionary[vertexA].Remove((from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem).First());
-                if (_connectionDictionary.Count > 0) _connectionDictionary[vertexB].Remove((from vertexItem in _connectionDictionary[vertexB] where vertexItem.connectedVertex.Equals(vertexA) select vertexItem).First());
+                IEnumerable<(int,Vertex<T>)> sequence = (from vertexItem in _connectionDictionary[vertexA] where vertexItem.connectedVertex.Equals(vertexB) select vertexItem);
+                if (sequence.Any()) _connectionDictionary[vertexA].Remove(sequence.First());
+                sequence = (from vertexItem in _connectionDictionary[vertexB] where vertexItem.connectedVertex.Equals(vertexA) select vertexItem);
+                if (sequence.Any()) _connectionDictionary[vertexB].Remove(sequence.First());
             }
             catch (Exception ex)
             {
