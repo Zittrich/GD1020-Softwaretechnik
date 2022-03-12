@@ -69,7 +69,7 @@ namespace GD1020_Softwaretechnik
         /// <description><paramref name="graphSize"/>: The amount of vertices the graph should have.</description>
         /// </item>
         /// <item>
-        /// <description><paramref name="maximumNeighbors"/>: The maximum amount a neighbours a vertex should have. The minimum is one.</description>
+        /// <description><paramref name="maximumNeighbors"/>: The maximum amount a neighbours a vertex should have. The minimum is two.</description>
         /// </item>
         /// <item>
         /// <description><paramref name="maximumWeight"/>: The maximum weight the describes a connection between to vertices.</description>
@@ -151,7 +151,6 @@ namespace GD1020_Softwaretechnik
                     }
                 }
                 unused.Remove(current);
-                Console.WriteLine("Removed " + current.ID);
                 current = next;
             }
         }

@@ -11,7 +11,7 @@ namespace GD1020_Softwaretechnik
         static void Main(string[] args)
         {
             GraphStructure<int> graphStructure = new GraphStructure<int>();
-            graphStructure.GenerateRandomGraph(100, 3, 10, 5);
+            graphStructure.GenerateRandomGraph(500, 5, 10, 5);
             graphStructure.PrintGraph();
             Console.WriteLine("Graph complete = " + graphStructure.checkComplete());
             Console.ReadLine();
