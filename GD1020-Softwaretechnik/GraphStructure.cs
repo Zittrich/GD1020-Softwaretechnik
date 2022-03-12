@@ -108,7 +108,7 @@ namespace GD1020_Softwaretechnik
                 for (int i = 0; i < randomNeighbourCount; i++)
                 {
                     int randomWeight = minimumWeight + ((maximumWeight - minimumWeight) == 0 ? 0 : random.Next(maximumWeight - minimumWeight));
-                    if (i == 0 && unused.Any())
+                    if (i == 0 && unused.Count > 1)
                     {
                         Vertex<T> newNeighbour = null;
                         bool isNotUnique;
@@ -120,7 +120,7 @@ namespace GD1020_Softwaretechnik
                                 newNeighbour = unused[random.Next(unused.Count)];
                                 isNotUnique = uniqueNeighbours.Contains(newNeighbour);
                                 withFreeConnections = possibleNeighbours[newNeighbour] > 0;
-                            } while (!isNotUnique && !withFreeConnections);
+                            } while (isNotUnique || !withFreeConnections);
                         }
                         uniqueNeighbours.Add(newNeighbour);
                         next = newNeighbour;
@@ -142,7 +142,7 @@ namespace GD1020_Softwaretechnik
                                 isNotUnique = uniqueNeighbours.Contains(newNeighbour);
                                 unusedWithTwoFreeConnections = possibleNeighbours[newNeighbour] > 2 && unused.Contains(newNeighbour);
                                 usedWithFreeConnections = possibleNeighbours[newNeighbour] > 0 && !unused.Contains(newNeighbour);
-                            } while (!isNotUnique && (!unusedWithTwoFreeConnections || !usedWithFreeConnections));
+                            } while (isNotUnique || !(unusedWithTwoFreeConnections || usedWithFreeConnections));
                         }
                         uniqueNeighbours.Add(newNeighbour);
                         possibleNeighbours[current]--;
@@ -150,8 +150,9 @@ namespace GD1020_Softwaretechnik
                         possibleNeighbours[newNeighbour]--; 
                     }
                 }
-                current = next;
                 unused.Remove(current);
+                Console.WriteLine("Removed " + current.ID);
+                current = next;
             }
         }
 
@@ -276,6 +277,7 @@ namespace GD1020_Softwaretechnik
                 Console.WriteLine(ex.Message);
                 return false;
             }
+            Console.WriteLine("Connected " + vertexA.ID + " to " + vertexB.ID);
             return true;
         }
         /// <summary>
