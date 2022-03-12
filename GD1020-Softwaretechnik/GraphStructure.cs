@@ -62,7 +62,7 @@ namespace GD1020_Softwaretechnik
             for (int i = 0; i < graphSize; i++)
             {
                 current = InsertVertex(i);
-                possibleNeighbours.Add(current, maximumNeighbors-1);
+                possibleNeighbours.Add(current, maximumNeighbors);
                 unused.Add(current);
                 all.Add(current);
             }
@@ -76,55 +76,74 @@ namespace GD1020_Softwaretechnik
                 uniqueNeighbours.Add(current);
                 for (int i = 0; i < randomNeighbourCount; i++)
                 {
-                    Vertex<T> newNeighbour = null;
-                    do
+                    int randomWeight = minimumWeight + ((maximumWeight - minimumWeight) == 0 ? 0 : random.Next(maximumWeight - minimumWeight));
+                    if (i == 0 && unused.Any())
                     {
-                        newNeighbour = all[random.Next(all.Count)];
-                    } while (uniqueNeighbours.Contains(newNeighbour) || possibleNeighbours[newNeighbour] <= 0);
-
-                    uniqueNeighbours.Add(newNeighbour);
-                    int randomWeight = minimumWeight + ((maximumWeight - minimumWeight) == 0 ? 0 : random.Next(maximumWeight-minimumWeight));
-                    if (unused.Contains(newNeighbour)) next = newNeighbour;
-                    if(ConnectVertices(current, newNeighbour, randomWeight))
-                    possibleNeighbours[current]--;
-                    if (ConnectVertices(newNeighbour, current, randomWeight))
-                    possibleNeighbours[newNeighbour]--;
-                }
-                if (next == null)
-                {
-                    if (unused.Any())
-                    {
-                        int randomWeight = minimumWeight + ((maximumWeight - minimumWeight) == 0 ? 0 : random.Next(maximumWeight - minimumWeight));
-                        if (uniqueNeighbours.Count > 1)
+                        Vertex<T> newNeighbour = null;
+                        bool isNotUnique;
+                        bool withFreeConnections;
+                        while (newNeighbour == null || (newNeighbour != null && !ConnectVertices(current, newNeighbour, randomWeight)))
                         {
-                            DisconnectVertices(uniqueNeighbours.ElementAt(1), current);
-                            possibleNeighbours[current]++;
-                            DisconnectVertices(current, uniqueNeighbours.ElementAt(1));
-                            possibleNeighbours[uniqueNeighbours.ElementAt(1)]++;
+                            do
+                            {
+                                newNeighbour = unused[random.Next(unused.Count)];
+                                isNotUnique = uniqueNeighbours.Contains(newNeighbour);
+                                withFreeConnections = possibleNeighbours[newNeighbour] > 0;
+                            } while (!isNotUnique && !withFreeConnections);
                         }
-                        do
-                        {
-                            next = unused[random.Next(unused.Count)];
-                        } while (possibleNeighbours[next] + 1 <= 0);
-                        ConnectVertices(current, next, randomWeight);
+                        uniqueNeighbours.Add(newNeighbour);
+                        next = newNeighbour;
                         possibleNeighbours[current]--;
-                        ConnectVertices(next, current, randomWeight);
-                        possibleNeighbours[next]--;
-                        current = next;
+                        ConnectVertices(newNeighbour, current, randomWeight);
+                        possibleNeighbours[newNeighbour]--;
                     }
-                    else
+                    else if(unused.Any())
                     {
-                        current = null;
+                        bool isNotUnique;
+                        bool unusedWithTwoFreeConnections;
+                        bool usedWithFreeConnections;
+                        Vertex<T> newNeighbour = null;
+                        while (newNeighbour == null || (newNeighbour != null && !ConnectVertices(current, newNeighbour, randomWeight)))
+                        {
+                            do
+                            {
+                                newNeighbour = all[random.Next(all.Count)];
+                                isNotUnique = uniqueNeighbours.Contains(newNeighbour);
+                                unusedWithTwoFreeConnections = possibleNeighbours[newNeighbour] > 2 && unused.Contains(newNeighbour);
+                                usedWithFreeConnections = possibleNeighbours[newNeighbour] > 0 && !unused.Contains(newNeighbour);
+                            } while (!isNotUnique && (!unusedWithTwoFreeConnections || !usedWithFreeConnections));
+                        }
+                        uniqueNeighbours.Add(newNeighbour);
+                        possibleNeighbours[current]--;
+                        ConnectVertices(newNeighbour, current, randomWeight);
+                        possibleNeighbours[newNeighbour]--; 
                     }
-                    
                 }
+                current = next;
                 unused.Remove(current);
             }
         }
 
-        public void GenerateRandomGridGraph(int graphSize, int maximumNeighbors, int maximumWeight)
+        public bool checkComplete()
         {
+            HashSet<Vertex<T>> all = new HashSet<Vertex<T>>();
+            Vertex<T> root = _connectionDictionary.Keys.First();
+            all.UnionWith(recursiveSearch(all, root));
+            return all.Count == _connectionDictionary.Count;
+        }
 
+        private HashSet<Vertex<T>> recursiveSearch(HashSet<Vertex<T>> all, Vertex<T> next)
+        {
+            var sequence = (from vertexItem in _connectionDictionary[next] select vertexItem).ToList();
+            foreach ((int, Vertex<T>) neighbour in sequence)
+            {
+                if (!all.Contains(neighbour.Item2))
+                {
+                    all.Add(neighbour.Item2);
+                    all.UnionWith(recursiveSearch(all, neighbour.Item2));
+                }
+            }
+            return all;
         }
 
         public Vertex<T> InsertVertex(int vertexID)
