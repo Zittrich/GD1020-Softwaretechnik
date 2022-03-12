@@ -51,7 +51,7 @@ namespace GD1020_Softwaretechnik
             }
         }
 
-        //TODO fix while(true) and unlimited neighbour size
+        //TODO sometimes maximumNeighbors+1 neighbors
         public void GenerateRandomGraph(int graphSize, int maximumNeighbors, int maximumWeight, int minimumWeight)
         {
             Dictionary<Vertex<T>, int> possibleNeighbours = new Dictionary<Vertex<T>, int>();
@@ -71,7 +71,7 @@ namespace GD1020_Softwaretechnik
             while (current != null)
             {
                 Vertex<T> next = null;
-                int randomNeighbourCount = possibleNeighbours[current] == 0 ? 0 : random.Next(possibleNeighbours[current])+1;
+                int randomNeighbourCount = possibleNeighbours[current] <= 0 ? 0 : random.Next(possibleNeighbours[current])+1;
                 HashSet<Vertex<T>> uniqueNeighbours = new HashSet<Vertex<T>>();
                 uniqueNeighbours.Add(current);
                 for (int i = 0; i < randomNeighbourCount; i++)
@@ -80,35 +80,43 @@ namespace GD1020_Softwaretechnik
                     do
                     {
                         newNeighbour = all[random.Next(all.Count)];
-                    } while (uniqueNeighbours.Contains(newNeighbour) || possibleNeighbours[newNeighbour] == 0);
+                    } while (uniqueNeighbours.Contains(newNeighbour) || possibleNeighbours[newNeighbour] <= 0);
 
-                    Console.WriteLine(current.ID + "->" + newNeighbour.ID);
                     uniqueNeighbours.Add(newNeighbour);
                     int randomWeight = minimumWeight + ((maximumWeight - minimumWeight) == 0 ? 0 : random.Next(maximumWeight-minimumWeight));
                     if (unused.Contains(newNeighbour)) next = newNeighbour;
-                    ConnectVertices(current, newNeighbour, randomWeight);
-                    possibleNeighbours[current]--; 
-                    ConnectVertices(newNeighbour, current, randomWeight);
+                    if(ConnectVertices(current, newNeighbour, randomWeight))
+                    possibleNeighbours[current]--;
+                    if (ConnectVertices(newNeighbour, current, randomWeight))
                     possibleNeighbours[newNeighbour]--;
                 }
-                if (unused.Count != 0)
+                if (next == null)
                 {
-                    if(next == null)
+                    if (unused.Any())
                     {
+                        int randomWeight = minimumWeight + ((maximumWeight - minimumWeight) == 0 ? 0 : random.Next(maximumWeight - minimumWeight));
+                        if (uniqueNeighbours.Count > 1)
+                        {
+                            DisconnectVertices(uniqueNeighbours.ElementAt(1), current);
+                            possibleNeighbours[current]++;
+                            DisconnectVertices(current, uniqueNeighbours.ElementAt(1));
+                            possibleNeighbours[uniqueNeighbours.ElementAt(1)]++;
+                        }
                         do
                         {
                             next = unused[random.Next(unused.Count)];
-                        } while (uniqueNeighbours.Contains(next) || possibleNeighbours[next] == 0);
-                        int randomWeight = minimumWeight + random.Next(maximumWeight - minimumWeight);
-                        Console.WriteLine(current.ID + "->" + next.ID);
+                        } while (possibleNeighbours[next] + 1 <= 0);
                         ConnectVertices(current, next, randomWeight);
+                        possibleNeighbours[current]--;
                         ConnectVertices(next, current, randomWeight);
+                        possibleNeighbours[next]--;
+                        current = next;
                     }
-                    current = next;
-                }
-                else
-                {
-                    current = null;
+                    else
+                    {
+                        current = null;
+                    }
+                    
                 }
                 unused.Remove(current);
             }
@@ -170,7 +178,7 @@ namespace GD1020_Softwaretechnik
             _connectionDictionary.Remove(vertex);
         }
 
-        public void ConnectVertices(Vertex<T> vertexA, Vertex<T> vertexB, int weight)
+        public bool ConnectVertices(Vertex<T> vertexA, Vertex<T> vertexB, int weight)
         {
             try
             {
@@ -183,7 +191,9 @@ namespace GD1020_Softwaretechnik
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return false;
             }
+            return true;
         }
 
         public void DisconnectVertices(Vertex<T> vertexA, Vertex<T> vertexB)
