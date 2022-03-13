@@ -61,9 +61,26 @@ namespace GD1020_Softwaretechnik
 
                             shortestTuples[i].Add(graphStructure.Adjacent[i][j].connection);
                         }
-                        else if (graphStructure.Adjacent[i][j].weight < currentWeight)
+                        else if (graphStructure.Adjacent[i][j].weight == currentWeight)
                         {
                             shortestTuples[i].Add(graphStructure.Adjacent[i][j].connection);
+                        }
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<int, List<int>> shortestTuple in shortestTuples)
+            {
+                foreach (var shortestValue in shortestTuple.Value)
+                {
+                    foreach (var connectionList in graphStructure.Adjacent)
+                    {
+                        for (int j = 0; j < connectionList.Count; j++)
+                        {
+                            if (connectionList[j] == (shortestValue, currentWeight, false))
+                            {
+                                graphStructure.MarkEdge(j, shortestValue);
+                            }
                         }
                     }
                 }
@@ -75,22 +92,17 @@ namespace GD1020_Softwaretechnik
                 {
                     if (IsCyclic(graphStructure, i, shortestTuples[i][j], i, new List<int>()))
                     {
-                        graphStructure.Adjacent[i].Remove((j, currentWeight, false));
+                        graphStructure.Adjacent[i].Remove((j, currentWeight, true));
                         graphStructure.RemoveEdge();
-                    }
-                    else
-                    {
-                        graphStructure.Adjacent[i].Remove((j, currentWeight, false));
-                        graphStructure.Adjacent[i].Add((j, currentWeight, true));
                     }
                 }
             }
 
-            for (int i = 0; i < graphStructure.Adjacent.Length; i++)
+            foreach (var connectionList in graphStructure.Adjacent)
             {
-                for (int j = 0; j < graphStructure.Adjacent[i].Count; j++)
+                for (int j = 0; j < connectionList.Count; j++)
                 {
-                    if(graphStructure.Adjacent[i][j].isMarked == false)
+                    if(connectionList[j].isMarked == false)
                         return MarkShortest(graphStructure);
                 }
             }

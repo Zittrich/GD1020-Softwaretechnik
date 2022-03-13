@@ -79,6 +79,7 @@ namespace GD1020_Softwaretechnik
             {
                 if (_adjacent[edgeA][i].connection == edgeB)
                 {
+                    _adjacent[edgeA][i] = (_adjacent[edgeA][i].connection, _adjacent[edgeA][i].weight, true);
                 }
             }
         }
