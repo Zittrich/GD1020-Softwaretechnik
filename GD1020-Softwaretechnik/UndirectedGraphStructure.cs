@@ -11,19 +11,19 @@ namespace GD1020_Softwaretechnik
         private readonly int _vertex;
         private int _edge;
 
-        private List<(int connection, int weight, bool isMarked)>[] _adjacent;
+        private List<(int connection, int weight, bool isMarked, bool isForward)>[] _adjacent;
 
         public UndirectedGraphStructure(int vertex)
         {
             _vertex = vertex;
 
-            _adjacent = new List<(int connection, int weight, bool isMarked)>[vertex];
+            _adjacent = new List<(int connection, int weight, bool isMarked, bool isForward)>[vertex];
 
             for (int i = 0; i < _adjacent.Length; i++)
-                _adjacent[i] = new List<(int connection, int weight, bool isMarked)>();
+                _adjacent[i] = new List<(int connection, int weight, bool isMarked, bool isForward)>();
         }
 
-        public List<(int connection, int weight, bool isMarked)>[] Adjacent
+        public List<(int connection, int weight, bool isMarked, bool isForward)>[] Adjacent
         {
             get => _adjacent;
             private set { }
@@ -46,12 +46,12 @@ namespace GD1020_Softwaretechnik
             if (edgeA > _adjacent.Length || edgeB > _adjacent.Length)
                 throw new ArgumentException("Invalid node number specified.");
 
-            _adjacent[edgeA].Add((edgeB, weight, false));
-            _adjacent[edgeB].Add((edgeA, weight, false));
+            _adjacent[edgeA].Add((edgeB, weight, false, true));
+            _adjacent[edgeB].Add((edgeA, weight, false, false));
             _edge++;
         }
 
-        public List<(int, int, bool)> GetAdjacency(int vertex)
+        public List<(int connection, int weight, bool isMarked, bool isForward)> GetAdjacency(int vertex)
         {
             return _adjacent[vertex];
         }
@@ -79,14 +79,36 @@ namespace GD1020_Softwaretechnik
             {
                 if (_adjacent[edgeA][i].connection == edgeB)
                 {
-                    _adjacent[edgeA][i] = (_adjacent[edgeA][i].connection, _adjacent[edgeA][i].weight, true);
+                    _adjacent[edgeA][i] = (_adjacent[edgeA][i].connection, _adjacent[edgeA][i].weight,
+                        true, _adjacent[edgeA][i].isForward);
+                    break;
                 }
             }
         }
 
-        public void RemoveEdge()
+        public void RemoveEdge(int edgeA, int edgeB)
         {
-            Edge -= 1;
+            for (int i = 0; i < _adjacent[edgeA].Count; i++)
+            {
+                if (_adjacent[edgeA][i].connection == edgeB)
+                {
+                    _adjacent[edgeA].Remove((_adjacent[edgeA][i].connection, _adjacent[edgeA][i].weight,
+                        _adjacent[edgeA][i].isMarked, _adjacent[edgeA][i].isForward));
+                    break;
+                }
+            }
+
+            for (int i = 0; i < _adjacent[edgeB].Count; i++)
+            {
+                if (_adjacent[edgeB][i].connection == edgeA)
+                {
+                    _adjacent[edgeB].Remove((_adjacent[edgeB][i].connection, _adjacent[edgeB][i].weight,
+                        _adjacent[edgeB][i].isMarked, _adjacent[edgeB][i].isForward));
+                    break;
+                }
+            }
+
+            _edge -= 1;
         }
     }
 }

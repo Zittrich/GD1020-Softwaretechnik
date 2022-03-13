@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,109 +31,181 @@ namespace GD1020_Softwaretechnik
             Console.ReadKey();
         }
 
+        //master Methode
         public static UndirectedGraphStructure ExecuteKruskal(UndirectedGraphStructure graphStructure)
         {
-            return MarkShortest(graphStructure);
+            List<int> sortedWeightList = new List<int>();
+            sortedWeightList = SortWeights(graphStructure);
+
+            UndirectedGraphStructure returnGraph = new UndirectedGraphStructure(graphStructure.Vertex);
+
+            return MarkShortest(graphStructure, sortedWeightList, returnGraph);
         }
 
-        private static UndirectedGraphStructure MarkShortest(UndirectedGraphStructure graphStructure)
+        private static UndirectedGraphStructure MarkShortest(UndirectedGraphStructure graphStructure, List<int> sortedWeights, UndirectedGraphStructure returnGraph)
         {
-            Dictionary<int, List<int>> shortestTuples = new Dictionary<int, List<int>>(graphStructure.Edge);
-            for (int i = 0; i < graphStructure.Edge; i++)
-            {
-                shortestTuples.Add(i, new List<int>());
-            }
-
-            int currentWeight = Int32.MaxValue;
-
+            //markiert kürzeste
             for (int i = 0; i < graphStructure.Adjacent.Length; i++)
             {
                 for (int j = 0; j < graphStructure.Adjacent[i].Count; j++)
                 {
                     if (graphStructure.Adjacent[i][j].isMarked == false)
                     {
-                        if (graphStructure.Adjacent[i][j].weight < currentWeight)
+                        if (graphStructure.Adjacent[i][j].weight == sortedWeights[0])
                         {
-                            currentWeight = graphStructure.Adjacent[i][j].weight;
-                            foreach (KeyValuePair<int, List<int>> shortestTuple in shortestTuples)
+                            if(!IsCyclic(graphStructure,i, graphStructure.Adjacent[i][j].connection, i, new List<int>()))
+                                graphStructure.MarkEdge(i, graphStructure.Adjacent[i][j].connection);
+                            else
                             {
-                                shortestTuple.Value.Clear();
-                            }
-
-                            shortestTuples[i].Add(graphStructure.Adjacent[i][j].connection);
-                        }
-                        else if (graphStructure.Adjacent[i][j].weight == currentWeight)
-                        {
-                            shortestTuples[i].Add(graphStructure.Adjacent[i][j].connection);
-                        }
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<int, List<int>> shortestTuple in shortestTuples)
-            {
-                foreach (var shortestValue in shortestTuple.Value)
-                {
-                    foreach (var connectionList in graphStructure.Adjacent)
-                    {
-                        for (int j = 0; j < connectionList.Count; j++)
-                        {
-                            if (connectionList[j] == (shortestValue, currentWeight, false))
-                            {
-                                graphStructure.MarkEdge(j, shortestValue);
+                                graphStructure.RemoveEdge(i, graphStructure.Adjacent[i][j].connection);
                             }
                         }
                     }
                 }
             }
 
-            for (int i = 0; i < shortestTuples.Count; i++)
+            /*
+            for (int i = 0; i < graphStructure.Adjacent.Length; i++)
             {
-                for (int j = 0; j < shortestTuples[i].Count; j++)
+                for (int j = 0; j < graphStructure.Adjacent[i].Count; j++)
                 {
-                    if (IsCyclic(graphStructure, i, shortestTuples[i][j], i, new List<int>()))
+                    if (IsCyclic(graphStructure, i, graphStructure.Adjacent[i][j].connection, i, new List<int>()))
+                    if(NewIsCyclic(graphStructure))
                     {
-                        graphStructure.Adjacent[i].Remove((j, currentWeight, true));
-                        graphStructure.RemoveEdge();
+                        graphStructure.RemoveEdge(i, graphStructure.Adjacent[i][j].connection);
                     }
-                }
-            }
+                    NewIsCyclic(graphStructure);
 
-            foreach (var connectionList in graphStructure.Adjacent)
-            {
-                for (int j = 0; j < connectionList.Count; j++)
-                {
-                    if(connectionList[j].isMarked == false)
-                        return MarkShortest(graphStructure);
                 }
+            }*/
+
+
+            sortedWeights.RemoveAt(0);
+
+            if (sortedWeights.Count > 0)
+            {
+                return MarkShortest(graphStructure, sortedWeights, returnGraph);
             }
 
             return graphStructure;
         }
 
+        private static List<int> SortWeights(UndirectedGraphStructure graphStructure)
+        {
+            //erstellt eine sortierte liste aller gewichte
+            List<int> sortedWeightList = new List<int>();
+            for (int i = 0; i < graphStructure.Adjacent.Length; i++)
+            {
+                for (int j = 0; j < graphStructure.Adjacent[i].Count; j++)
+                {
+                    if (!sortedWeightList.Contains(graphStructure.Adjacent[i][j].weight))
+                    {
+                        sortedWeightList.Add(graphStructure.Adjacent[i][j].weight);
+                    }
+                }
+            }
+            sortedWeightList.Sort();
+            //möglicherweise effizienteren Sortieralgoritmus?
+
+            return sortedWeightList;
+        }
+
         private static bool IsCyclic(UndirectedGraphStructure graphStructure, int vertexA, int vertexB, int startingVertex, List<int> connectionList)
         {
-            if (startingVertex == vertexA)
+            //go two steps
+            //check if you reach the original one again after going two steps
+
+            //I want to go through each connection of a given vertex and look at the connections of all the connections of that vertex and if that equals the original then its a loop
+            // A -> B -> C <= has A in it?
+
+            //sehr ineffizient
+            //Zieht nicht größere loops in betracht --> Funktioniert nicht
+            //NewIsCyclic()
+
+            //hier einen Depth First Search einbauen?
+            
+
+            for (int i = 0; i < graphStructure.Adjacent[vertexA].Count; i++)
             {
-                foreach (int i in connectionList)
+                if(graphStructure.Adjacent[vertexA][i].isForward)
                 {
-                    if (i == vertexB)
-                        return true;
+                    for (int j = 0; j < graphStructure.Adjacent[graphStructure.Adjacent[vertexA][i].connection].Count; j++)
+                    {
+                        if(graphStructure.Adjacent[graphStructure.Adjacent[vertexA][i].connection][j].isForward)
+                        {
+                            for (int l = 0; l < graphStructure.Adjacent[graphStructure.Adjacent[graphStructure.Adjacent[vertexA][i].connection][j].connection].Count; l++)
+                            {
+                                if(graphStructure.Adjacent[graphStructure.Adjacent[graphStructure.Adjacent[vertexA][i].connection][j].connection][l].isForward)
+                                {
+                                    if (graphStructure.Adjacent[graphStructure.Adjacent[graphStructure.Adjacent[vertexA][i].connection][j].connection][l].connection == vertexA)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-
-                return false;
             }
 
-            startingVertex += 1;
-
-            foreach ((int connection, int weight, bool isMarked) valueTuple in graphStructure.Adjacent[startingVertex])
-            {
-                if(valueTuple.isMarked)
-                    connectionList.Add(valueTuple.connection);
-            }
-
-            return IsCyclic(graphStructure, vertexA, vertexB, startingVertex, connectionList);
+            return false;
         }
+
+        private static UndirectedGraphStructure NewIsCyclic(UndirectedGraphStructure graphStructure, UndirectedGraphStructure returnGraph)
+        {
+            //neuer isCyclic checker
+            //Funktioniert nicht
+            //mit bool
+
+            int vertexAmount = graphStructure.Vertex;
+            bool[] visited = new bool[vertexAmount];
+
+            for (int i = 0; i < vertexAmount; i++)
+            {
+                visited[i] = false;
+            }
+
+            for (int u = 0; u < vertexAmount; u++)
+            {
+                if (!visited[u])
+                {
+                    (bool isCyclic, int connection, int weight) thisCyclicCheck = isCyclicUtil(graphStructure, u, visited, -1);
+                    if (!thisCyclicCheck.isCyclic)
+                    {
+                        returnGraph.AddEdge(u, thisCyclicCheck.connection, thisCyclicCheck.weight);
+
+                        //graphStructure.RemoveEdge(u, isCyclicUtil(graphStructure, u, visited, -1).connectedVertex);
+                    }
+                }
+            }
+            return returnGraph;
+        }
+
+        private static (bool isCyclic, int connectedVertex, int weight) isCyclicUtil(UndirectedGraphStructure graphStructure, int startingVertex, bool[] visited, int parent)
+        {
+            visited[startingVertex] = true;
+
+            foreach ((int connection, int weight, bool isMarked, bool isForward) valueTuple in graphStructure.Adjacent[startingVertex])
+            {
+                if (!visited[valueTuple.connection])
+                {
+                    if (isCyclicUtil(graphStructure, valueTuple.connection, visited, startingVertex).isCyclic)
+                    {
+                        return (true, valueTuple.connection, valueTuple.weight);
+                    }
+                }
+                else if (valueTuple.connection != parent)
+                {
+                    return (true, valueTuple.connection, valueTuple.weight);
+
+                }
+                return (false, valueTuple.connection, valueTuple.weight);
+            }
+
+            return (false, 0, 0);
+        }
+
+        //  -- Versuch mit gerichteten Graphen --
 
         /*private static void Main(string[] args)
         {
