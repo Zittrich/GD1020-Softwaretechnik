@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 //Cursor Parkplatz
 
@@ -59,6 +60,34 @@ namespace GD1020_Softwaretechnik
                 }
                 Console.WriteLine();
             }
+        }
+
+        /// <summary>
+        /// Returns how many individual Vertices are part of the graph
+        /// </summary>
+        /// <returns>Amount of Vertices</returns>
+        public int VertexCount()
+        {
+            int output = 0;
+            foreach (KeyValuePair<Vertex<T>, List<(int weight, Vertex<T> connectedVertex)>> keyValuePair in _connectionDictionary)
+            {
+                output += 1;
+            }
+
+            return output;
+        }
+
+        public Vertex<T> FindVertById(int id)
+        {
+            foreach (var key in ConnectionDictionary.Keys.ToList())
+            {
+                if (key.ID == id)
+                {
+                    return key;
+                }
+            }
+
+            throw new Exception("Could not find matching Vertex ID");
         }
 
         /// <summary>
